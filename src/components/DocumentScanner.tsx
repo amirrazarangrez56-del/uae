@@ -41,12 +41,6 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -54,6 +48,12 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     }
     setIsCameraActive(false);
   };
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
 
   const startCamera = async () => {
     setCameraError(null);
@@ -249,9 +249,10 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
       {/* Main Extraction Action Button */}
       <div className="scanner-action-bottom">
+
         {!hasApiKeys ? (
           <div className="no-keys-alert">
-            <span>Please add your Gemini API key in Settings (gear icon on top right).</span>
+            <span>Live AI: Add Gemini API key in Settings (gear icon on top right).</span>
             <button type="button" className="add-key-link" onClick={onOpenKeyModal}>
               Settings ⚙️
             </button>
@@ -267,7 +268,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
             <span>
               {isExtracting
                 ? 'Extracting Document Details...'
-                : 'Extract All Details & Fill A4 Form'}
+                : 'Live Gemini AI Extract & Parse'}
             </span>
           </button>
         )}

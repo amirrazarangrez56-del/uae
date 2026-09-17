@@ -13,7 +13,7 @@
    Minimalist Top Bar
    -------------------------------------------------------------------------- */
 .clean-top-bar {
-  height: 60px;
+  height: 64px;
   background: #ffffff;
   border-bottom: 1px solid var(--border-light);
   display: flex;
@@ -87,7 +87,8 @@
 .top-bar-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
+  flex-shrink: 0;
 }
 
 .clean-print-btn {
@@ -101,6 +102,9 @@
   font-size: 0.82rem;
   font-weight: 600;
   border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .clean-print-btn:hover {
@@ -118,6 +122,9 @@
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .clean-settings-btn:hover {
@@ -126,27 +133,46 @@
   border-color: #cbd5e1;
 }
 
-.active-keys-dot {
+.gear-icon {
+  color: #64748b;
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.clean-settings-btn:hover .gear-icon {
+  transform: rotate(35deg);
+  color: #0f172a;
+}
+
+.active-keys-badge {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  color: var(--success);
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35);
+  pointer-events: none;
 }
 
 .empty-keys-dot {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: -3px;
+  right: -3px;
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: var(--warning);
   color: #ffffff;
+  border: 2px solid #ffffff;
   font-size: 0.65rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -1243,3 +1269,491 @@
     page-break-inside: avoid !important;
   }
 }
+
+/* ==========================================================================
+   SARI AL MESK HOTEL (فندق سري المسك) - FRONT DESK ROOMS BOARD
+   ========================================================================== */
+.header-hotel-arabic-title {
+  font-family: var(--font-arabic-luxury);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  margin-left: 6px;
+  padding-top: 2px;
+}
+
+.header-checkedin-count {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  margin-left: 4px;
+  line-height: 1.2;
+}
+
+.sari-hotel-board-page {
+  max-width: 1320px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2.25rem 2.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Rooms Board Container */
+.rooms-board-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Rooms Header Row with Filter Pills (Matches Screenshot) */
+.rooms-top-control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rooms-section-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+
+.rooms-filter-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.filter-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.filter-pill-btn:hover {
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.filter-pill-btn.active-dark {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+}
+
+.pill-count-tag {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
+
+.filter-pill-btn.active-dark .pill-count-tag {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+/* Rooms Grid (Matches Screenshot: 101 Occupied, 102, 103, 777 Ready) */
+.pms-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 1100px) {
+  .pms-rooms-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.pms-room-card {
+  min-height: 230px;
+  border-radius: 20px;
+  padding: 1.75rem 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.pms-room-card:hover {
+  transform: translateY(-4px);
+}
+
+.room-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.room-number-display {
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+/* 1. OCCUPIED CARD STYLING (Like Room 101 in screenshot) */
+.pms-room-card.occupied-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.pms-room-card.occupied-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.1);
+}
+
+.badge-pill.badge-occupied {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 1.2rem;
+}
+
+.occupied-guest-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.guest-name-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  max-width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guest-icon {
+  color: #334155;
+  flex-shrink: 0;
+}
+
+.guest-phone-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.phone-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.guest-checkin-time-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+  padding: 0.22rem 0.55rem;
+  margin-top: 0.35rem;
+  max-width: 96%;
+  box-sizing: border-box;
+}
+
+.guest-checkin-time-line .time-icon {
+  color: #059669;
+  flex-shrink: 0;
+}
+
+.guest-checkin-time-line .guest-time-text {
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.occupied-card-hover-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.btn-pms-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.btn-view-dossier {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-view-dossier:hover {
+  background: #e2e8f0;
+}
+
+.btn-checkout {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.btn-checkout:hover {
+  background: #fecaca;
+}
+
+/* 2. READY CARD STYLING (Rooms 102, 103, 777 in screenshot) */
+.pms-room-card.ready-card {
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  box-shadow: 0 1px 4px rgba(22, 163, 74, 0.05);
+}
+
+.pms-room-card.ready-card:hover {
+  border-color: #86efac;
+  background: #ecfdf5;
+  box-shadow: 0 8px 22px -3px rgba(22, 163, 74, 0.15);
+}
+
+.badge-pill.badge-ready {
+  background: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  margin-bottom: 0.8rem;
+}
+
+.ready-click-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #15803d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.pms-room-card.ready-card:hover .ready-click-hint {
+  opacity: 1;
+}
+
+.empty-rooms-state {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+
+/* Form Editor Room Check-In Bar */
+.room-checkin-banner {
+  margin: 0.75rem 1.5rem 1.25rem;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  transition: all 0.25s ease;
+}
+
+.room-checkin-banner.banner-vacant {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.room-checkin-banner.banner-checked-in {
+  background: #ecfdf5;
+  border: 1.5px solid #10b981;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+}
+
+.checkin-banner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.room-title-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #0f172a;
+}
+
+.room-title-num {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.room-title-type {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.checkin-status-row {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #059669;
+  color: #ffffff;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.badge-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.35rem;
+  padding-left: 0.45rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.status-badge-amber {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.vacant-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d97706;
+}
+
+.btn-checkin-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-checkin-action:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.btn-checkin-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-checkout-action {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #ffffff;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-checkout-action:hover {
+  background: #fef2f2;
+}
+

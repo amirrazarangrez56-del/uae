@@ -39,3 +39,22 @@ export interface ExtractionLog {
   status: 'success' | 'quota_failover' | 'error' | 'info';
   message: string;
 }
+
+export type RoomStatus = 'available' | 'checked_in' | 'checked_out';
+
+export interface DemoGuestProfile {
+  id: string;
+  roomNumber: string;
+  roomType: string;
+  guestName: string;
+  phoneNumber?: string;
+  nationality: string;
+  docType: 'UAE Golden Visa' | 'Tourist Visa' | 'Umrah Pilgrim Visa' | 'Diplomatic Passport';
+  docNumber: string;
+  durationOfStay: string;
+  documentImageUrl: string;
+  status: RoomStatus;
+  checkInTime?: string;
+  notes?: string;
+  parsedData: TravelDocumentData;
+}

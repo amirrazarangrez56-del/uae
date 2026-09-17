@@ -1,12 +1,24 @@
 import React from 'react';
-import type { TravelDocumentData } from '../types/document';
-import { FileText, Printer, RotateCcw } from 'lucide-react';
+import type { TravelDocumentData, DemoGuestProfile } from '../types/document';
+import { 
+  FileText, 
+  Printer, 
+  RotateCcw, 
+  CheckCircle2, 
+  DoorOpen, 
+  BedDouble, 
+  Clock, 
+  ShieldCheck 
+} from 'lucide-react';
 
 interface FormEditorProps {
   data: TravelDocumentData;
   onChange: (updated: TravelDocumentData) => void;
   onReset: () => void;
   onSwitchToA4: () => void;
+  activeDemoProfile?: DemoGuestProfile | null;
+  onCheckInRoom?: () => void;
+  onCheckOutRoom?: () => void;
 }
 
 export const FormEditor: React.FC<FormEditorProps> = ({
@@ -14,6 +26,9 @@ export const FormEditor: React.FC<FormEditorProps> = ({
   onChange,
   onReset,
   onSwitchToA4,
+  activeDemoProfile,
+  onCheckInRoom,
+  onCheckOutRoom,
 }) => {
   const handleFieldChange = (field: keyof TravelDocumentData, val: string) => {
     onChange({
@@ -21,6 +36,11 @@ export const FormEditor: React.FC<FormEditorProps> = ({
       [field]: val,
     });
   };
+
+  const isCheckedIn = activeDemoProfile?.status === 'checked_in';
+  const roomNumber = activeDemoProfile?.roomNumber || '205';
+  const roomType = activeDemoProfile?.roomType || 'Standard Deluxe Suite';
+  const hasExtractedData = Boolean(data.name || data.passportNumber || data.visaNumber);
 
   return (
     <div className="clean-card form-box">
@@ -50,6 +70,62 @@ export const FormEditor: React.FC<FormEditorProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Prominent Room Check-In & Tracking Bar */}
+      <div className={`room-checkin-banner ${isCheckedIn ? 'banner-checked-in' : 'banner-vacant'}`}>
+        <div className="checkin-banner-info">
+          <div className="room-title-line">
+            <BedDouble size={18} />
+            <span className="room-title-num">Room {roomNumber}</span>
+            <span className="room-title-type">• {roomType}</span>
+          </div>
+
+          <div className="checkin-status-row">
+            {isCheckedIn ? (
+              <div className="status-badge-green">
+                <CheckCircle2 size={14} />
+                <span>CHECKED IN</span>
+                {activeDemoProfile?.checkInTime && (
+                  <span className="badge-time">
+                    <Clock size={12} /> {activeDemoProfile.checkInTime}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div className="status-badge-amber">
+                <span className="vacant-pulse-dot"></span>
+                <span>VACANT / READY FOR CHECK-IN</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="checkin-banner-actions">
+          {!isCheckedIn ? (
+            <button
+              type="button"
+              className="btn-checkin-action"
+              onClick={onCheckInRoom}
+              disabled={!hasExtractedData && !activeDemoProfile}
+              title="Confirm document verification and check guest into room"
+            >
+              <ShieldCheck size={16} />
+              <span>Check-In Room {roomNumber}</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn-checkout-action"
+              onClick={onCheckOutRoom}
+              title="Release room and check out guest"
+            >
+              <DoorOpen size={16} />
+              <span>Check Out Room</span>
+            </button>
+          )}
+        </div>
+      </div>
+
 
       <div className="clean-form-grid">
         {/* Row 1: Name */}
