@@ -336,7 +336,7 @@ export const INITIAL_HOTEL_ROOMS: HotelRoom[] = [
     checkOutTime: '',
     nights: 1,
     payment: {
-      mode: 'UPI',
+      mode: 'Card',
       status: 'Pending',
       currency: 'SAR',
       totalAmount: 350,
@@ -386,7 +386,7 @@ export const INITIAL_HOTEL_ROOMS: HotelRoom[] = [
     checkOutTime: '',
     nights: 1,
     payment: {
-      mode: 'Cheque',
+      mode: 'Cash',
       status: 'Pending',
       currency: 'SAR',
       totalAmount: 1200,

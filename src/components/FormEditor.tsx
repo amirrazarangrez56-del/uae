@@ -19,8 +19,6 @@ import {
   Calendar,
   CreditCard,
   Banknote,
-  Smartphone,
-  FileCheck2,
   Users,
   Plus,
   AlertTriangle,
@@ -368,7 +366,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({
         <div className="payment-mode-selector">
           <label className="mode-label">Payment Mode (طريقة الدفع):</label>
           <div className="mode-pills-row">
-            {(['Cash', 'Cheque', 'UPI', 'Card'] as PaymentMode[]).map((mode) => (
+            {(['Cash', 'Card'] as PaymentMode[]).map((mode) => (
               <button
                 key={mode}
                 type="button"
@@ -376,8 +374,6 @@ export const FormEditor: React.FC<FormEditorProps> = ({
                 onClick={() => handlePaymentChange('mode', mode)}
               >
                 {mode === 'Cash' && <Banknote size={15} />}
-                {mode === 'Cheque' && <FileCheck2 size={15} />}
-                {mode === 'UPI' && <Smartphone size={15} />}
                 {mode === 'Card' && <CreditCard size={15} />}
                 <span>{mode}</span>
               </button>
@@ -450,14 +446,14 @@ export const FormEditor: React.FC<FormEditorProps> = ({
 
           <div className="form-item full-span">
             <label htmlFor="transactionRef">
-              Transaction / Cheque No / UPI UTR (رقم الحوالة أو الشيك)
+              Transaction / Card Auth Ref (رقم المرجع أو البطاقة)
             </label>
             <input
               id="transactionRef"
               type="text"
               value={payment.transactionRef || ''}
               onChange={(e) => handlePaymentChange('transactionRef', e.target.value)}
-              placeholder="e.g. TXN-894120 / CHQ-10492 / UPI-9028850715@ybl"
+              placeholder="e.g. TXN-894120 / AUTH-98214"
               className="font-mono"
             />
           </div>

@@ -11,8 +11,6 @@ import {
   Calendar,
   CreditCard,
   Banknote,
-  Smartphone,
-  FileCheck2,
   Wrench,
   Brush
 } from 'lucide-react';
@@ -180,8 +178,6 @@ export const LandingDemoPage: React.FC<LandingDemoPageProps> = ({
                         {payment && (
                           <div className={`guest-payment-badge ${payment.status?.toLowerCase() || 'pending'}`}>
                             {payment.mode === 'Cash' && <Banknote size={12} />}
-                            {payment.mode === 'Cheque' && <FileCheck2 size={12} />}
-                            {payment.mode === 'UPI' && <Smartphone size={12} />}
                             {payment.mode === 'Card' && <CreditCard size={12} />}
                             <span>{payment.mode} • {payment.amountPaid || payment.totalAmount || room.pricePerNight} SAR</span>
                             <span className="pay-tag-status">({payment.status})</span>

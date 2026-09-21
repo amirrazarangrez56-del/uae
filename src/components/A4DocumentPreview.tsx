@@ -228,7 +228,7 @@ export const A4DocumentPreview: React.FC<A4DocumentPreviewProps> = ({
                   </div>
                   {payment.transactionRef && (
                     <div className="pay-meta-box full-width">
-                      <span className="pay-label">TRANSACTION REF / CHEQUE / UPI:</span>
+                      <span className="pay-label">TRANSACTION / CARD AUTH REF (المرجع):</span>
                       <span className="pay-val font-mono">{payment.transactionRef}</span>
                     </div>
                   )}

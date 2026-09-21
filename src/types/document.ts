@@ -42,7 +42,7 @@ export interface ExtractionLog {
 
 export type RoomStatus = 'available' | 'checked_in' | 'checked_out' | 'cleaning' | 'maintenance';
 
-export type PaymentMode = 'Cash' | 'Cheque' | 'UPI' | 'Card';
+export type PaymentMode = 'Cash' | 'Card';
 export type PaymentStatus = 'Paid' | 'Pending' | 'Partial';
 
 export interface RoomPaymentInfo {
