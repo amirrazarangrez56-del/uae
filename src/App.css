@@ -1280,43 +1280,21 @@
 /* ==========================================================================
    SARI AL MESK HOTEL (فندق ساري المسك) - FRONT DESK ROOMS BOARD
    ========================================================================== */
-.hotel-brand-white {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  background: #ffffff;
-  padding: 0.15rem 0.35rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.hotel-brand-white:hover {
-  opacity: 0.85;
-}
-
 .header-hotel-arabic-title {
   font-family: var(--font-hotel-brand);
-  font-size: 1.55rem;
+  font-size: 1.65rem;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.2px;
-  line-height: 1.3;
-  margin-bottom: 3px;
+  line-height: 1.2;
   direction: rtl;
-  display: block;
+  display: inline-block;
+  user-select: none;
+  transition: opacity 0.15s ease;
 }
 
-.header-hotel-en-sub {
-  font-family: var(--font-sans);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 1.6px;
-  color: #2563eb;
-  text-transform: uppercase;
-  line-height: 1;
-  display: block;
+.header-hotel-arabic-title:hover {
+  opacity: 0.85;
 }
 
 .hotel-bilingual-brand {
