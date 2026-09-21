@@ -16,6 +16,7 @@ export function cleanApiKey(key: string): string {
 
 export const RECOMMENDED_MODELS = [
   'gemini-3.1-flash-lite',
+  'gemini-3.1-flash-lite-preview',
   'gemini-flash-lite-latest',
   'gemini-3.6-flash',
   'gemini-3.8-flash',
@@ -41,7 +42,61 @@ export function isQuotaExceededError(status: number, message: string): boolean {
 }
 
 /**
- * Robustly parses JSON from LLM response, handling markdown fences, leading/trailing text, and nested wrappers.
+ * Automatically converts SVG data URLs or SVG markup to high-resolution PNG data URLs
+ * because Gemini Vision API inline_data rejects image/svg+xml with 400 INVALID_ARGUMENT.
+ */
+export async function convertSvgToPngDataUrl(svgDataUrl: string): Promise<string> {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return svgDataUrl;
+  }
+
+  if (!svgDataUrl.startsWith('data:image/svg+xml') && !svgDataUrl.includes('<svg')) {
+    return svgDataUrl;
+  }
+
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const width = img.naturalWidth || 1200;
+          const height = img.naturalHeight || 800;
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(svgDataUrl);
+            return;
+          }
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const pngData = canvas.toDataURL('image/png', 0.95);
+          resolve(pngData);
+        } catch {
+          resolve(svgDataUrl);
+        }
+      };
+
+      img.onerror = () => {
+        resolve(svgDataUrl);
+      };
+
+      img.src = svgDataUrl;
+    } catch {
+      resolve(svgDataUrl);
+    }
+  });
+}
+
+/**
+ * Robustly parses JSON from LLM response, handling markdown fences, leading/trailing text, arrays, and nested wrappers.
  */
 export function parseGeminiJsonResponse(rawText: string): any {
   if (!rawText || typeof rawText !== 'string') {
@@ -79,6 +134,20 @@ export function parseGeminiJsonResponse(rawText: string): any {
     }
   }
 
+  // 4. Extract between outer brackets [ { ... } ]
+  const firstBracket = trimmed.indexOf('[');
+  const lastBracket = trimmed.lastIndexOf(']');
+  if (firstBracket !== -1 && lastBracket > firstBracket) {
+    try {
+      const arr = JSON.parse(trimmed.slice(firstBracket, lastBracket + 1));
+      if (Array.isArray(arr) && arr.length > 0) {
+        return arr[0];
+      }
+    } catch {
+      // continue
+    }
+  }
+
   throw new Error(`Failed to extract valid JSON from response: ${trimmed.slice(0, 120)}`);
 }
 
@@ -97,17 +166,28 @@ export async function extractDocumentWithFailover(
     throw new Error('Please enter at least one Gemini API key in Settings (gear icon on top right).');
   }
 
-  // Extract base64
-  const match = base64ImageWithHeader.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+  // Auto-convert SVG to raster PNG so Gemini Vision API never encounters 400 INVALID_ARGUMENT
+  const rasterImage = await convertSvgToPngDataUrl(base64ImageWithHeader);
+
+  // Extract base64 and mimeType
+  const match = rasterImage.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
   let mimeType = 'image/jpeg';
-  let base64Data = base64ImageWithHeader;
+  let base64Data = rasterImage;
 
   if (match) {
     mimeType = match[1];
     base64Data = match[2];
-  } else if (base64ImageWithHeader.includes(',')) {
-    const parts = base64ImageWithHeader.split(',');
+  } else if (rasterImage.includes(',')) {
+    const parts = rasterImage.split(',');
     base64Data = parts[1];
+    const headerMatch = parts[0].match(/data:(image\/[a-zA-Z0-9+.-]+)/);
+    if (headerMatch) {
+      mimeType = headerMatch[1];
+    }
+  }
+
+  if (mimeType.includes('svg')) {
+    mimeType = 'image/png';
   }
 
   const systemPrompt = `You are an expert passport and visa document OCR extractor.
@@ -190,12 +270,13 @@ Output ONLY the raw JSON object. Do not include markdown or explanations.`;
         }
 
         if (res.status === 429) {
-          // Quota limit hit on this specific model, try next candidate model (e.g. gemini-3.1-flash-lite)
+          // Quota limit hit on this specific model, try next candidate model
           continue;
         }
 
         if (!res.ok) {
-          // Non-quota error, try next model or break
+          const errBody = await res.text().catch(() => '');
+          console.warn(`Gemini API call returned ${res.status} for ${candidateModel}:`, errBody);
           continue;
         }
 
@@ -211,18 +292,18 @@ Output ONLY the raw JSON object. Do not include markdown or explanations.`;
         const flatParsed: any = parsedRaw.visa_details || parsedRaw.details || parsedRaw.document || parsedRaw;
 
         successfulData = {
-          visaNumber: flatParsed.visaNumber || flatParsed.visa_number || flatParsed.visaNo || '',
-          dateOfIssue: flatParsed.dateOfIssue || flatParsed.issue_date || flatParsed.date_of_issue || '',
-          validUntil: flatParsed.validUntil || flatParsed.expiry_date || flatParsed.valid_until || flatParsed.expiryDate || '',
-          durationOfStay: flatParsed.durationOfStay || flatParsed.duration || flatParsed.duration_of_stay || '',
-          passportNumber: flatParsed.passportNumber || flatParsed.passport_number || flatParsed.passportNo || '',
-          placeOfIssue: flatParsed.placeOfIssue || flatParsed.place_of_issue || flatParsed.issue_place || '',
-          name: flatParsed.name || flatParsed.full_name || flatParsed.fullName || flatParsed.applicant_name || '',
-          dateOfBirth: flatParsed.dateOfBirth || flatParsed.date_of_birth || flatParsed.dob || '',
-          nationality: flatParsed.nationality || flatParsed.citizenship || '',
-          typeOfVisa: flatParsed.typeOfVisa || flatParsed.visa_type || flatParsed.visaType || '',
-          umrahOperator: flatParsed.umrahOperator || flatParsed.umrah_operator || flatParsed.saudi_company || flatParsed.company || '',
-          externalAgent: flatParsed.externalAgent || flatParsed.external_agent || flatParsed.agent || '',
+          visaNumber: flatParsed.visaNumber || flatParsed.visa_number || flatParsed.visaNo || flatParsed.visa_no || '',
+          dateOfIssue: flatParsed.dateOfIssue || flatParsed.issue_date || flatParsed.date_of_issue || flatParsed.issueDate || '',
+          validUntil: flatParsed.validUntil || flatParsed.expiry_date || flatParsed.valid_until || flatParsed.expiryDate || flatParsed.expiration_date || '',
+          durationOfStay: flatParsed.durationOfStay || flatParsed.duration || flatParsed.duration_of_stay || flatParsed.stay_duration || '',
+          passportNumber: flatParsed.passportNumber || flatParsed.passport_number || flatParsed.passportNo || flatParsed.passport_no || '',
+          placeOfIssue: flatParsed.placeOfIssue || flatParsed.place_of_issue || flatParsed.issue_place || flatParsed.place || '',
+          name: flatParsed.name || flatParsed.full_name || flatParsed.fullName || flatParsed.applicant_name || flatParsed.passenger_name || '',
+          dateOfBirth: flatParsed.dateOfBirth || flatParsed.date_of_birth || flatParsed.dob || flatParsed.birthDate || '',
+          nationality: flatParsed.nationality || flatParsed.citizenship || flatParsed.country || '',
+          typeOfVisa: flatParsed.typeOfVisa || flatParsed.visa_type || flatParsed.visaType || flatParsed.entry_type || '',
+          umrahOperator: flatParsed.umrahOperator || flatParsed.umrah_operator || flatParsed.saudi_company || flatParsed.company || flatParsed.sponsor || '',
+          externalAgent: flatParsed.externalAgent || flatParsed.external_agent || flatParsed.agent || flatParsed.agency || '',
           applicantPhotoUrl: base64ImageWithHeader,
           barcode: (flatParsed.visaNumber || flatParsed.visa_number) ? `VISA-${flatParsed.visaNumber || flatParsed.visa_number}` : '',
           notes: '',
@@ -259,7 +340,7 @@ Output ONLY the raw JSON object. Do not include markdown or explanations.`;
       };
     }
 
-    // If this key failed on all candidate models (quota exhausted)
+    // If this key failed on all candidate models (quota exhausted or error)
     const hasNextKey = keyIdx + 1 < validKeys.length;
     const failoverLog: ExtractionLog = {
       id: `log-${Date.now()}`,
@@ -268,8 +349,8 @@ Output ONLY the raw JSON object. Do not include markdown or explanations.`;
       keyIndex: keyConfig.id,
       status: 'quota_failover',
       message: hasNextKey
-        ? `⚡ ${keyConfig.label} quota exceeded. Auto-shifted to ${validKeys[keyIdx + 1].label}.`
-        : `❌ ${keyConfig.label} quota exhausted.`,
+        ? `⚡ ${keyConfig.label} quota/rate limit reached. Auto-shifted to ${validKeys[keyIdx + 1].label}.`
+        : `❌ ${keyConfig.label} failed or quota exhausted.`,
     };
     logs.push(failoverLog);
 
@@ -287,7 +368,7 @@ Output ONLY the raw JSON object. Do not include markdown or explanations.`;
     }
   }
 
-  throw new Error('Quota exceeded on configured Gemini API key. Please add another key in Settings (⚙️) or wait a moment.');
+  throw new Error('Gemini extraction failed. Please verify your API key in Settings (⚙️) or wait a moment.');
 }
 
 /**

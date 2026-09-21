@@ -1,14 +1,15 @@
 import React from 'react';
 import type { GeminiKeyConfig } from '../types/document';
-import { Settings, Printer, FileText, Building2 } from 'lucide-react';
+import { Settings, Printer, FileText, Building2, ShieldCheck } from 'lucide-react';
 
 interface HeaderProps {
   keys: GeminiKeyConfig[];
   onOpenKeyModal: () => void;
   onPrintA4: () => void;
-  activeTab: 'demo' | 'editor' | 'a4';
-  setActiveTab: (tab: 'demo' | 'editor' | 'a4') => void;
+  activeTab: 'demo' | 'editor' | 'a4' | 'admin';
+  setActiveTab: (tab: 'demo' | 'editor' | 'a4' | 'admin') => void;
   checkedInCount?: number;
+  totalRoomsCount?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -49,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setActiveTab('editor')}
           >
             <FileText size={15} />
-            <span>Scanner &amp; Parsing</span>
+            <span>Scanner &amp; Check-In</span>
           </button>
           <button
             type="button"
@@ -58,6 +59,14 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Printer size={15} />
             <span>A4 Size Paper</span>
+          </button>
+          <button
+            type="button"
+            className={`view-pill ${activeTab === 'admin' ? 'active' : ''}`}
+            onClick={() => setActiveTab('admin')}
+          >
+            <ShieldCheck size={15} />
+            <span>Admin Panel</span>
           </button>
         </div>
       </div>

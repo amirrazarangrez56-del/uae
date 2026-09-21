@@ -1,4 +1,4 @@
-import type { TravelDocumentData, DemoGuestProfile } from '../types/document';
+import type { TravelDocumentData, DemoGuestProfile, HotelRoom } from '../types/document';
 
 export const EMPTY_DOCUMENT: TravelDocumentData = {
   visaNumber: '',
@@ -295,67 +295,128 @@ export function generateUmrahVisaSvg(): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-// Realistic Demo Guest Profiles linked to Hotel Rooms (Rooms 101, 102, 103, 777)
-export const INITIAL_DEMO_GUESTS: DemoGuestProfile[] = [
+// Realistic Hotel Rooms & Guest Profiles (Rooms 101, 102, 103, 777)
+export const INITIAL_HOTEL_ROOMS: HotelRoom[] = [
   {
-    id: 'guest-101',
+    id: 'room-101',
     roomNumber: '101',
     roomType: 'Deluxe Room',
-    guestName: '',
-    phoneNumber: '',
-    nationality: '',
-    docType: 'UAE Golden Visa',
-    docNumber: '',
-    durationOfStay: '',
-    documentImageUrl: '',
-    status: 'available', // All rooms start empty / READY
-    checkInTime: undefined,
-    parsedData: EMPTY_DOCUMENT
+    floor: '1st Floor',
+    maxCapacity: 2,
+    pricePerNight: 280,
+    status: 'available', // Ready for check-in
+    checkInDate: '',
+    checkInTime: '',
+    checkOutDate: '',
+    checkOutTime: '',
+    nights: 1,
+    payment: {
+      mode: 'Cash',
+      status: 'Pending',
+      currency: 'SAR',
+      totalAmount: 280,
+      amountPaid: 0,
+      balanceDue: 280,
+      transactionRef: '',
+      notes: ''
+    },
+    guests: []
   },
   {
-    id: 'guest-102',
+    id: 'room-102',
     roomNumber: '102',
     roomType: 'Superior King',
-    guestName: '',
-    phoneNumber: '',
-    nationality: '',
-    docType: 'Tourist Visa',
-    docNumber: '',
-    durationOfStay: '',
-    documentImageUrl: '',
-    status: 'available', // READY
-    checkInTime: undefined,
-    parsedData: EMPTY_DOCUMENT
+    floor: '1st Floor',
+    maxCapacity: 3,
+    pricePerNight: 350,
+    status: 'available',
+    checkInDate: '',
+    checkInTime: '',
+    checkOutDate: '',
+    checkOutTime: '',
+    nights: 1,
+    payment: {
+      mode: 'UPI',
+      status: 'Pending',
+      currency: 'SAR',
+      totalAmount: 350,
+      amountPaid: 0,
+      balanceDue: 350,
+      transactionRef: '',
+      notes: ''
+    },
+    guests: []
   },
   {
-    id: 'guest-103',
+    id: 'room-103',
     roomNumber: '103',
     roomType: 'Executive Suite',
-    guestName: '',
-    phoneNumber: '',
-    nationality: '',
-    docType: 'UAE Golden Visa',
-    docNumber: '',
-    durationOfStay: '',
-    documentImageUrl: '',
-    status: 'available', // READY
-    checkInTime: undefined,
-    parsedData: EMPTY_DOCUMENT
+    floor: '2nd Floor',
+    maxCapacity: 4,
+    pricePerNight: 550,
+    status: 'available',
+    checkInDate: '',
+    checkInTime: '',
+    checkOutDate: '',
+    checkOutTime: '',
+    nights: 1,
+    payment: {
+      mode: 'Card',
+      status: 'Pending',
+      currency: 'SAR',
+      totalAmount: 550,
+      amountPaid: 0,
+      balanceDue: 550,
+      transactionRef: '',
+      notes: ''
+    },
+    guests: []
   },
   {
-    id: 'guest-777',
+    id: 'room-777',
     roomNumber: '777',
     roomType: 'Royal Penthouse',
-    guestName: '',
-    phoneNumber: '',
-    nationality: '',
-    docType: 'Umrah Pilgrim Visa',
-    docNumber: '',
-    durationOfStay: '',
-    documentImageUrl: '',
-    status: 'available', // READY
-    checkInTime: undefined,
-    parsedData: EMPTY_DOCUMENT
+    floor: '7th Floor',
+    maxCapacity: 6,
+    pricePerNight: 1200,
+    status: 'available',
+    checkInDate: '',
+    checkInTime: '',
+    checkOutDate: '',
+    checkOutTime: '',
+    nights: 1,
+    payment: {
+      mode: 'Cheque',
+      status: 'Pending',
+      currency: 'SAR',
+      totalAmount: 1200,
+      amountPaid: 0,
+      balanceDue: 1200,
+      transactionRef: '',
+      notes: ''
+    },
+    guests: []
   }
 ];
+
+// Backwards-compatible export mapping
+export const INITIAL_DEMO_GUESTS: DemoGuestProfile[] = INITIAL_HOTEL_ROOMS.map((r) => ({
+  id: r.id,
+  roomNumber: r.roomNumber,
+  roomType: r.roomType,
+  guestName: '',
+  phoneNumber: '',
+  nationality: '',
+  docType: 'Tourist Visa',
+  docNumber: '',
+  durationOfStay: '',
+  documentImageUrl: '',
+  status: r.status,
+  checkInTime: undefined,
+  maxCapacity: r.maxCapacity,
+  payment: r.payment,
+  guests: r.guests,
+  parsedData: EMPTY_DOCUMENT,
+}));
+
 

@@ -9,8 +9,18 @@ import {
   Trash2, 
   FileText,
   StopCircle,
-  ScanLine
+  ScanLine,
+  Plus,
+  Layers,
+  CheckCircle2
 } from 'lucide-react';
+
+export interface QueuedDocument {
+  id: string;
+  name: string;
+  base64: string;
+  status: 'pending' | 'extracting' | 'completed' | 'failed';
+}
 
 interface DocumentScannerProps {
   imageSrc: string | null;
@@ -20,6 +30,17 @@ interface DocumentScannerProps {
   isExtracting: boolean;
   hasApiKeys: boolean;
   onOpenKeyModal: () => void;
+
+  // Multi-document / bulk upload support
+  queuedFiles?: QueuedDocument[];
+  onAddQueuedFiles?: (files: QueuedDocument[]) => void;
+  onRemoveQueuedFile?: (id: string) => void;
+  onSelectQueuedFile?: (file: QueuedDocument) => void;
+  onExtractAllBatch?: () => void;
+  batchProgress?: { current: number; total: number; currentDocName?: string } | null;
+  activeRoomNumber?: string;
+  maxCapacity?: number;
+  currentGuestCount?: number;
 }
 
 export const DocumentScanner: React.FC<DocumentScannerProps> = ({
@@ -30,6 +51,15 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   isExtracting,
   hasApiKeys,
   onOpenKeyModal,
+  queuedFiles = [],
+  onAddQueuedFiles,
+  onRemoveQueuedFile,
+  onSelectQueuedFile,
+  onExtractAllBatch,
+  batchProgress,
+  activeRoomNumber,
+  maxCapacity,
+  currentGuestCount = 0,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -83,27 +113,59 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
     stopCamera();
+
+    const newDoc: QueuedDocument = {
+      id: `cam-${Date.now()}`,
+      name: `Camera Snapshot ${queuedFiles.length + 1}`,
+      base64: dataUrl,
+      status: 'pending',
+    };
+
+    if (onAddQueuedFiles) {
+      onAddQueuedFiles([newDoc]);
+    }
     onImageSelected(dataUrl);
     setZoomLevel(1);
     setRotation(0);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    readFile(file);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    processFiles(Array.from(files));
+    e.target.value = '';
   };
 
-  const readFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        onImageSelected(reader.result);
+  const processFiles = (files: File[]) => {
+    const validImageFiles = files.filter((f) => f.type.startsWith('image/'));
+    if (validImageFiles.length === 0) return;
+
+    const readPromises = validImageFiles.map((file, idx) => {
+      return new Promise<QueuedDocument>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve({
+            id: `doc-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 7)}`,
+            name: file.name,
+            base64: typeof reader.result === 'string' ? reader.result : '',
+            status: 'pending',
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readPromises).then((docs) => {
+      if (docs.length > 0) {
+        if (onAddQueuedFiles) {
+          onAddQueuedFiles(docs);
+        }
+        // Set the first as the active preview
+        onImageSelected(docs[0].base64);
         setZoomLevel(1);
         setRotation(0);
       }
-    };
-    reader.readAsDataURL(file);
+    });
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -118,31 +180,114 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      readFile(file);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      processFiles(files);
     }
   };
+
+  const hasMultipleQueue = queuedFiles.length > 1;
 
   return (
     <div className="clean-card scanner-box">
       <div className="clean-card-header">
         <div className="clean-card-title">
           <ScanLine size={18} className="text-primary" />
-          <span>Document Scanner & Uploader</span>
+          <span>Passport &amp; Visa Scanner</span>
+          {activeRoomNumber && (
+            <span className="scanner-room-tag">Room {activeRoomNumber}</span>
+          )}
         </div>
-        {imageSrc && (
-          <button
-            type="button"
-            className="clean-icon-btn"
-            onClick={onClearImage}
-            title="Remove document"
-          >
-            <Trash2 size={16} />
-          </button>
-        )}
+        
+        <div className="clean-header-actions">
+          {queuedFiles.length > 0 && (
+            <button
+              type="button"
+              className="clean-btn-subtle small"
+              onClick={() => fileInputRef.current?.click()}
+              title="Add more passports or visas to this room"
+            >
+              <Plus size={13} />
+              <span>Add More</span>
+            </button>
+          )}
+
+          {imageSrc && (
+            <button
+              type="button"
+              className="clean-icon-btn"
+              onClick={onClearImage}
+              title="Clear active image"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Capacity & Multiple Passports Info Banner */}
+      {maxCapacity !== undefined && (
+        <div className="scanner-capacity-banner">
+          <div className="capacity-text">
+            <Layers size={14} />
+            <span>Room Capacity: <strong>{maxCapacity} Guests</strong></span>
+            <span className="occupants-pill">Current: {currentGuestCount} / {maxCapacity}</span>
+          </div>
+          {queuedFiles.length > 0 && (
+            <div className="queued-count-badge">
+              {queuedFiles.length} {queuedFiles.length === 1 ? 'Document' : 'Documents'} Queued
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Multi-Document Queue Strip (When 2+ files are queued) */}
+      {queuedFiles.length > 0 && (
+        <div className="multi-doc-queue-strip">
+          <div className="queue-strip-scroll">
+            {queuedFiles.map((doc, index) => {
+              const isSelected = doc.base64 === imageSrc;
+              return (
+                <div
+                  key={doc.id}
+                  className={`doc-queue-item ${isSelected ? 'selected' : ''} ${doc.status}`}
+                  onClick={() => {
+                    onSelectQueuedFile?.(doc);
+                    onImageSelected(doc.base64);
+                    setZoomLevel(1);
+                    setRotation(0);
+                  }}
+                  title={doc.name}
+                >
+                  <img src={doc.base64} alt={doc.name} className="queue-thumb-img" />
+                  <div className="queue-item-meta">
+                    <span className="queue-item-num">#{index + 1}</span>
+                    <span className="queue-item-name">{doc.name}</span>
+                  </div>
+                  {doc.status === 'completed' && (
+                    <CheckCircle2 size={13} className="queue-status-done" />
+                  )}
+                  {onRemoveQueuedFile && (
+                    <button
+                      type="button"
+                      className="queue-remove-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveQueuedFile(doc.id);
+                      }}
+                      title="Remove from queue"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Main Viewfinder / Image Viewport / Dropzone */}
       {isCameraActive ? (
         <div className="camera-viewfinder-box">
           <video ref={videoRef} autoPlay playsInline className="camera-video-feed" />
@@ -213,19 +358,14 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
         >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden-file-input"
-          />
           <div className="dropzone-center">
             <div className="dropzone-icon-box">
               <UploadCloud size={30} />
             </div>
-            <h3 className="dropzone-heading">Upload Passport or Visa</h3>
-            <p className="dropzone-sub">Drag and drop file here, or click to browse</p>
+            <h3 className="dropzone-heading">Upload Passport(s) or Visa(s)</h3>
+            <p className="dropzone-sub">
+              Upload single or multiple passports/visas for bulk room entry
+            </p>
 
             <div className="dropzone-buttons" onClick={(e) => e.stopPropagation()}>
               <button
@@ -234,7 +374,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
                 onClick={() => fileInputRef.current?.click()}
               >
                 <FileText size={15} />
-                <span>Browse File</span>
+                <span>Browse Multiple Files</span>
               </button>
               <button type="button" className="clean-btn-outline" onClick={startCamera}>
                 <Camera size={15} />
@@ -247,9 +387,41 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         </div>
       )}
 
-      {/* Main Extraction Action Button */}
-      <div className="scanner-action-bottom">
+      {/* Batch Extraction Progress Notification */}
+      {batchProgress && (
+        <div className="batch-progress-box">
+          <div className="progress-header">
+            <span>
+              Extracting Document {batchProgress.current} of {batchProgress.total}...
+            </span>
+            <span className="progress-pct">
+              {Math.round((batchProgress.current / batchProgress.total) * 100)}%
+            </span>
+          </div>
+          <div className="progress-bar-track">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }}
+            />
+          </div>
+          {batchProgress.currentDocName && (
+            <div className="progress-doc-title">{batchProgress.currentDocName}</div>
+          )}
+        </div>
+      )}
 
+      {/* Hidden file input for adding more */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+      />
+
+      {/* Main Extraction Action Bottom */}
+      <div className="scanner-action-bottom">
         {!hasApiKeys ? (
           <div className="no-keys-alert">
             <span>Live AI: Add Gemini API key in Settings (gear icon on top right).</span>
@@ -257,6 +429,20 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
               Settings ⚙️
             </button>
           </div>
+        ) : hasMultipleQueue && onExtractAllBatch ? (
+          <button
+            type="button"
+            className={`extract-btn-main ${isExtracting ? 'extracting' : ''}`}
+            onClick={onExtractAllBatch}
+            disabled={isExtracting}
+          >
+            <Sparkles size={17} className={isExtracting ? 'spinning' : ''} />
+            <span>
+              {isExtracting
+                ? `Extracting ${batchProgress?.current || 1} of ${queuedFiles.length}...`
+                : `Live Gemini AI Extract All (${queuedFiles.length} Documents)`}
+            </span>
+          </button>
         ) : (
           <button
             type="button"
