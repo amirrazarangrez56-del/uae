@@ -13,7 +13,8 @@
    Minimalist Top Bar
    -------------------------------------------------------------------------- */
 .clean-top-bar {
-  height: 64px;
+  min-height: 68px;
+  height: 68px;
   background: #ffffff;
   border-bottom: 1px solid var(--border-light);
   display: flex;
@@ -1279,46 +1280,43 @@
 /* ==========================================================================
    SARI AL MESK HOTEL (فندق ساري المسك) - FRONT DESK ROOMS BOARD
    ========================================================================== */
-.hotel-signboard-badge {
+.hotel-brand-white {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
-  color: #ffffff;
-  padding: 0.35rem 0.95rem 0.35rem 0.95rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #ffffff;
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
-.hotel-signboard-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.32);
+.hotel-brand-white:hover {
+  opacity: 0.85;
 }
 
 .header-hotel-arabic-title {
   font-family: var(--font-hotel-brand);
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.2px;
-  line-height: 1.15;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  line-height: 1.3;
+  margin-bottom: 3px;
   direction: rtl;
+  display: block;
 }
 
 .header-hotel-en-sub {
   font-family: var(--font-sans);
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 1.4px;
-  color: #bfdbfe;
+  letter-spacing: 1.6px;
+  color: #2563eb;
   text-transform: uppercase;
   line-height: 1;
-  margin-top: 1px;
+  display: block;
 }
 
 .hotel-bilingual-brand {
