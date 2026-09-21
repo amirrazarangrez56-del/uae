@@ -1277,17 +1277,75 @@
 }
 
 /* ==========================================================================
-   SARI AL MESK HOTEL (فندق سري المسك) - FRONT DESK ROOMS BOARD
+   SARI AL MESK HOTEL (فندق ساري المسك) - FRONT DESK ROOMS BOARD
    ========================================================================== */
+.hotel-signboard-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
+  color: #ffffff;
+  padding: 0.35rem 0.95rem 0.35rem 0.95rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hotel-signboard-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.32);
+}
+
 .header-hotel-arabic-title {
-  font-family: var(--font-arabic-luxury);
-  font-size: 1.6rem;
-  font-weight: 900;
-  color: #0f172a;
-  letter-spacing: -0.3px;
+  font-family: var(--font-hotel-brand);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  direction: rtl;
+}
+
+.header-hotel-en-sub {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #bfdbfe;
+  text-transform: uppercase;
   line-height: 1;
-  margin-left: 6px;
-  padding-top: 2px;
+  margin-top: 1px;
+}
+
+.hotel-bilingual-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.hotel-ar-name {
+  font-family: var(--font-hotel-brand);
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  direction: rtl;
+  line-height: 1.15;
+  letter-spacing: -0.3px;
+}
+
+.hotel-en-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #2563eb;
+  text-transform: uppercase;
 }
 
 .header-checkedin-count {

@@ -25,9 +25,11 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="clean-top-bar no-print">
       <div className="top-bar-left">
-        <div className="clean-brand" onClick={() => setActiveTab('demo')} title="فندق سري المسك">
-          <div className="brand-dot"></div>
-          <span className="header-hotel-arabic-title" dir="rtl">فندق سري المسك</span>
+        <div className="clean-brand" onClick={() => setActiveTab('demo')} title="فندق ساري المسك - Sari Al Mesk Hotel">
+          <div className="hotel-signboard-badge">
+            <span className="header-hotel-arabic-title" dir="rtl">فندق ساري المسك</span>
+            <span className="header-hotel-en-sub">SARI AL MESK HOTEL</span>
+          </div>
         </div>
 
         <div className="minimal-view-switch">

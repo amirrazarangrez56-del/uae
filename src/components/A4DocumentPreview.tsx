@@ -167,7 +167,7 @@ export const A4DocumentPreview: React.FC<A4DocumentPreviewProps> = ({
                 <div className="table-print-header">
                   <div className="header-text-side">
                     <div className="hotel-bilingual-brand">
-                      <div className="hotel-ar-name">فندق سري المسك</div>
+                      <div className="hotel-ar-name" dir="rtl">فندق ساري المسك</div>
                       <div className="hotel-en-name">SARI AL MESK HOTEL</div>
                     </div>
                     <h1 className="table-doc-title">GUEST CHECK-IN &amp; TRAVEL DOCUMENT PARTICULARS</h1>
