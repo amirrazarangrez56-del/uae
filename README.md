@@ -1,6 +1,6 @@
-# Emirates DocScan AI • Passport & Visa OCR Scanner
+# فندق ساري المسك • Sari Al Mesk Hotel PMS & Guest Registration System
 
-A clean, modern React + TypeScript web application for scanning and uploading passport/visa documents (Saudi Umrah visas, UAE tourist/residence visas, international passports), extracting all key particulars via Google Gemini Vision API, editing details in real time, and generating a 1-page printable official A4 table-wise document.
+A clean, modern React + TypeScript hotel management & guest registration system for Sari Al Mesk Hotel (فندق ساري المسك), scanning and uploading passport/visa documents (Saudi Umrah visas, UAE tourist/residence visas, international passports), extracting all key particulars via Google Gemini Vision API, editing details in real time, managing room occupancy, and generating a printable official A4 table-wise document.
 
 ## Features
 

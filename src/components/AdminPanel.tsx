@@ -13,7 +13,8 @@ import {
   CreditCard,
   Minus,
   Sparkles,
-  X
+  X,
+  Key
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -22,6 +23,7 @@ interface AdminPanelProps {
   onUpdateRoom: (roomId: string, updates: Partial<HotelRoom>) => void;
   onDeleteRoom: (roomId: string) => void;
   onSelectRoomForCheckIn: (room: HotelRoom) => void;
+  onOpenKeyModal?: () => void;
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
@@ -30,6 +32,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   onUpdateRoom,
   onDeleteRoom,
   onSelectRoomForCheckIn,
+  onOpenKeyModal,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | RoomStatus>('all');
@@ -171,14 +174,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          className="clean-btn-primary admin-add-btn"
-          onClick={handleOpenAddModal}
-        >
-          <Plus size={16} />
-          <span>Add New Room</span>
-        </button>
+        <div className="admin-header-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          {onOpenKeyModal && (
+            <button
+              type="button"
+              className="clean-btn-secondary"
+              onClick={onOpenKeyModal}
+              title="Configure Gemini API Keys (Auto-Failover)"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.55rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                background: '#ffffff',
+                color: '#334155',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Key size={16} />
+              <span>Gemini API Keys</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="clean-btn-primary admin-add-btn"
+            onClick={handleOpenAddModal}
+          >
+            <Plus size={16} />
+            <span>Add New Room</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Overview Metrics Dashboard */}

@@ -831,6 +831,7 @@ export function App() {
             onUpdateRoom={handleUpdateRoom}
             onDeleteRoom={handleDeleteRoom}
             onSelectRoomForCheckIn={handleSelectRoom}
+            onOpenKeyModal={() => setIsKeyModalOpen(true)}
           />
         )}
       </main>

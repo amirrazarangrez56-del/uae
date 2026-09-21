@@ -1,10 +1,10 @@
 import React from 'react';
 import type { GeminiKeyConfig } from '../types/document';
-import { Settings, Printer, FileText, Building2, ShieldCheck } from 'lucide-react';
+import { Printer, FileText, Building2, ShieldCheck } from 'lucide-react';
 
 interface HeaderProps {
-  keys: GeminiKeyConfig[];
-  onOpenKeyModal: () => void;
+  keys?: GeminiKeyConfig[];
+  onOpenKeyModal?: () => void;
   onPrintA4: () => void;
   activeTab: 'demo' | 'editor' | 'a4' | 'admin';
   setActiveTab: (tab: 'demo' | 'editor' | 'a4' | 'admin') => void;
@@ -13,14 +13,11 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  keys,
-  onOpenKeyModal,
   onPrintA4,
   activeTab,
   setActiveTab,
   checkedInCount = 0,
 }) => {
-  const configuredCount = keys.filter((k) => k.key && k.key.trim().length > 0).length;
 
   return (
     <header className="clean-top-bar no-print">
@@ -80,22 +77,6 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Printer size={16} />
           <span>Print A4 Form</span>
-        </button>
-
-        {/* Minimal Settings Gear Icon on Top Right */}
-        <button
-          type="button"
-          className="clean-settings-btn"
-          onClick={onOpenKeyModal}
-          title="Configure Gemini API Keys (Auto-Failover)"
-          aria-label="Settings"
-        >
-          <Settings size={18} className="gear-icon" />
-          {configuredCount > 0 ? (
-            <span className="active-keys-badge" title={`${configuredCount} Gemini key(s) active`} />
-          ) : (
-            <span className="empty-keys-dot" title="Add Gemini API key">!</span>
-          )}
         </button>
       </div>
     </header>
