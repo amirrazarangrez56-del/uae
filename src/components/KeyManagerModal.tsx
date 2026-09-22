@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { GeminiKeyConfig } from '../types/document';
-import { testGeminiKey } from '../services/geminiService';
+import { testGeminiKey, HARDCODED_GEMINI_KEY } from '../services/geminiService';
 import { 
   KeyRound, 
   X, 
@@ -38,6 +38,10 @@ export const KeyManagerModal: React.FC<KeyManagerModalProps> = ({
     3: false,
   });
   const [testingStatus, setTestingStatus] = useState<{ [id: number]: string }>({});
+
+  useEffect(() => {
+    setLocalKeys(keys);
+  }, [keys, isOpen]);
 
   if (!isOpen) return null;
 
@@ -132,6 +136,17 @@ export const KeyManagerModal: React.FC<KeyManagerModalProps> = ({
                       <span className="key-label-text">{keyConfig.label}</span>
                       {idx === 0 && <span className="primary-pill">Primary Key</span>}
                       {idx > 0 && <span className="failover-pill">Auto-Backup #{idx}</span>}
+                      {idx === 0 && keyConfig.key !== HARDCODED_GEMINI_KEY && (
+                        <button
+                          type="button"
+                          className="clean-btn-subtle small"
+                          onClick={() => handleKeyChange(keyConfig.id, HARDCODED_GEMINI_KEY)}
+                          title="Reset Key 1 to hardcoded default key"
+                          style={{ marginLeft: 'auto', fontSize: '11px', padding: '2px 8px' }}
+                        >
+                          Restore Default Key
+                        </button>
+                      )}
                     </div>
 
                     <div className="key-status-indicator">
@@ -164,7 +179,7 @@ export const KeyManagerModal: React.FC<KeyManagerModalProps> = ({
                         type={isVisible ? 'text' : 'password'}
                         value={keyConfig.key}
                         onChange={(e) => handleKeyChange(keyConfig.id, e.target.value)}
-                        placeholder={`Enter Gemini API Key ${idx + 1} (AIzaSy...)`}
+                        placeholder={idx === 0 ? "Hardcoded Production Key (Ready out-of-the-box)" : `Enter Gemini API Key ${idx + 1}`}
                         className="key-input"
                       />
                       <button

@@ -30,6 +30,7 @@ interface DocumentScannerProps {
   isExtracting: boolean;
   hasApiKeys: boolean;
   onOpenKeyModal: () => void;
+  onLoadSample?: () => void;
 
   // Multi-document / bulk upload support
   queuedFiles?: QueuedDocument[];
@@ -51,6 +52,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   isExtracting,
   hasApiKeys,
   onOpenKeyModal,
+  onLoadSample,
   queuedFiles = [],
   onAddQueuedFiles,
   onRemoveQueuedFile,
@@ -137,10 +139,12 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   };
 
   const processFiles = (files: File[]) => {
-    const validImageFiles = files.filter((f) => f.type.startsWith('image/'));
-    if (validImageFiles.length === 0) return;
+    const validFiles = files.filter(
+      (f) => f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+    );
+    if (validFiles.length === 0) return;
 
-    const readPromises = validImageFiles.map((file, idx) => {
+    const readPromises = validFiles.map((file, idx) => {
       return new Promise<QueuedDocument>((resolve) => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -380,6 +384,17 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
                 <Camera size={15} />
                 <span>Use Camera</span>
               </button>
+              {onLoadSample && (
+                <button
+                  type="button"
+                  className="clean-btn-outline"
+                  onClick={onLoadSample}
+                  title="Load a built-in sample document to test AI parsing immediately"
+                >
+                  <Sparkles size={15} />
+                  <span>Try Sample Document</span>
+                </button>
+              )}
             </div>
 
             {cameraError && <div className="camera-error-badge">{cameraError}</div>}
@@ -415,7 +430,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/*"
+        accept="image/*,application/pdf,.pdf"
         multiple
         style={{ display: 'none' }}
       />

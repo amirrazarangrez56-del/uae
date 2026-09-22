@@ -5,8 +5,8 @@ import type {
   HotelRoom,
   GuestEntry
 } from './types/document';
-import { EMPTY_DOCUMENT, INITIAL_HOTEL_ROOMS } from './services/sampleData';
-import { extractDocumentWithFailover } from './services/geminiService';
+import { EMPTY_DOCUMENT, INITIAL_HOTEL_ROOMS, generateUaeVisaSvg } from './services/sampleData';
+import { extractDocumentWithFailover, HARDCODED_GEMINI_KEY } from './services/geminiService';
 import { Header } from './components/Header';
 import { KeyManagerModal } from './components/KeyManagerModal';
 import { DocumentScanner, type QueuedDocument } from './components/DocumentScanner';
@@ -22,14 +22,14 @@ import {
 } from 'lucide-react';
 import './App.css';
 
-const PROVIDED_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || '';
+const PROVIDED_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || HARDCODED_GEMINI_KEY;
 
 const DEFAULT_KEYS: GeminiKeyConfig[] = [
   {
     id: 1,
-    key: PROVIDED_API_KEY,
-    label: 'Key 1 (Primary)',
-    status: PROVIDED_API_KEY ? 'active' : 'untested',
+    key: PROVIDED_API_KEY || HARDCODED_GEMINI_KEY,
+    label: 'Key 1 (Primary Built-in)',
+    status: 'active',
     errorCount: 0,
   },
   {
@@ -55,10 +55,12 @@ export function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          if (PROVIDED_API_KEY) {
+          const firstKeyVal = parsed[0]?.key ? String(parsed[0].key).trim() : '';
+          // If Key 1 is empty, whitespace, or invalid placeholder, apply hardcoded key
+          if (!firstKeyVal || firstKeyVal.includes('...')) {
             parsed[0] = {
               ...parsed[0],
-              key: PROVIDED_API_KEY,
+              key: PROVIDED_API_KEY || HARDCODED_GEMINI_KEY,
               status: 'active',
               errorCount: 0,
             };
@@ -139,7 +141,7 @@ export function App() {
     showToast('Keys Saved', 'Gemini API keys updated successfully.');
   };
 
-  const hasConfiguredKeys = keys.some((k) => k.key && k.key.trim().length > 0);
+  const hasConfiguredKeys = keys.some((k) => k.key && k.key.trim().length > 0) || Boolean(HARDCODED_GEMINI_KEY);
 
   // Sync documentData with the active guest when switching rooms or guest tabs
   const handleSelectRoom = (room: HotelRoom) => {
@@ -772,6 +774,20 @@ export function App() {
                 isExtracting={isExtracting}
                 hasApiKeys={hasConfiguredKeys}
                 onOpenKeyModal={() => setIsKeyModalOpen(true)}
+                onLoadSample={() => {
+                  const sampleDoc = generateUaeVisaSvg();
+                  setImageSrc(sampleDoc);
+                  setDocumentData((prev) => ({ ...prev, applicantPhotoUrl: sampleDoc }));
+                  setQueuedDocs([
+                    {
+                      id: `sample-${Date.now()}`,
+                      name: 'Sample UAE Golden Visa.svg',
+                      base64: sampleDoc,
+                      status: 'pending',
+                    },
+                  ]);
+                  showToast('Sample Loaded', 'UAE Golden Visa sample loaded. Click Live Extract to parse!', 'success');
+                }}
                 queuedFiles={queuedDocs}
                 onAddQueuedFiles={(newDocs) => {
                   setQueuedDocs((prev) => [...prev, ...newDocs]);
